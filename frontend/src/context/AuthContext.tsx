@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (token) {
       api.defaults.headers.Authorization = `Bearer ${token}`;
       setAuthenticated(true);
@@ -53,33 +54,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    api.defaults.headers.Authorization = null;
+    // Corrija a linha abaixo para usar null ou delete
+    delete api.defaults.headers.Authorization;
     setUser(null);
     setAuthenticated(false);
   };
 
-  const handleUpdateUser = (userData: any) => {
-    // Pegue só os campos que você usa no contexto
-    setUser({
-      id: userData.id,
-      name: userData.name,
-      email: userData.email,
-      cpf: userData.cpf,
-      isAdmin: userData.isAdmin,
-    });
-  };
-
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, authenticated }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, logout, authenticated }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-  return context;
+  return useContext(AuthContext);
 };

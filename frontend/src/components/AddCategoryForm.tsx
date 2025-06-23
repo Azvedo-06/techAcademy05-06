@@ -21,7 +21,6 @@ const AddCategoryForm = ({
   onCancel,
 }: AddCategoryFormProps) => {
   const [name, setName] = useState(category?.name || "");
-  const [description, setDescription] = useState(category?.description || "");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +36,6 @@ const AddCategoryForm = ({
 
       // Limpar formulário
       setName("");
-      setDescription("");
 
       // Atualizar lista de categorias
       onCategoryAdded();

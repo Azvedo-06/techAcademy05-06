@@ -1,15 +1,27 @@
 import { Sequelize } from "sequelize";
 
-const sequelize = new Sequelize("projeto05", "root", "", {
-  host: "localhost",
-  dialect: "mysql",
-  logging: false,
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000,
-  },
-});
+const isTest = process.env.NODE_ENV === "test";
+
+const sequelize = new Sequelize(
+  (isTest ? process.env.DB_NAME_TEST : process.env.DB_NAME)!,
+  process.env.DB_USER!,
+  process.env.DB_PASSWORD!,
+  {
+    host: process.env.DB_HOST!,
+    dialect: "mysql",
+    logging: !isTest,
+  }
+);
+
+if (process.env.NODE_ENV !== "test") {
+  (async () => {
+    try {
+      await sequelize.sync({ alter: true });
+      console.log("Banco de dados sincronizado.");
+    } catch (error) {
+      console.error("Erro ao sincronizar o banco de dados.", error);
+    }
+  })();
+}
 
 export default sequelize;
