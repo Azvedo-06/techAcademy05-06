@@ -3,23 +3,23 @@ import { test, expect } from '@playwright/test';
 test.describe('Crud completa de categorias', () => {
     test('Deve realizar o fluxo completo de criar, editar, listar e excluir uma categoria de livro', async ({page}) => {
         // login
-        page.goto('http://localhost:5173/login');
+        page.goto('https://nexolivro.com.br/login');
 
-        await page.fill('#email', 'admin@gmail.com');
-        await page.fill('#password', '123456');
+        await page.fill('#email', 'emanuelramospaiva@gmail.com');
+        await page.fill('#password', 'Manu010!');
 
         await page.getByRole("button", { name: "Entrar" }).click()
-        await expect(page).toHaveURL('http://localhost:5173/');
+        await expect(page).toHaveURL('https://nexolivro.com.br/');
         await page.getByRole("link", {name: "Categorias"} )
 
         // Criar uma categoria
-        await page.goto('http://localhost:5173/categories');
+        await page.goto('https://nexolivro.com.br/categories');
         
         await page.fill('#name', 'Terror');
         await page.click('button[type="submit"]');
         
         // listar categorias
-        await page.goto('http://localhost:5173/categories');
+        await page.goto('https://nexolivro.com.br/categories');
         await page.locator('h2.book-title', { hasText: 'Terror' });
 
         // Editar produto
@@ -42,22 +42,29 @@ test.describe('Crud completa de categorias', () => {
         await expect(page.locator('h2.book-title:has-text("Ficção")')).toHaveCount(0);
     })
 
-    // inputs vazios
     test('Deve exibir erro ao tentar criar uma categoria com nome vazio', async ({page}) => {
-        await page.goto('http://localhost:5173/login');
-
-        await page.fill('#email', 'admin@gmail.com');
-        await page.fill('#password', '123456');
-
-        await page.getByRole("button", { name: "Entrar" }).click()
-        await expect(page).toHaveURL('http://localhost:5173/');
-        await page.getByRole("link", {name: "Categorias"} );
-
-        await page.goto('http://localhost:5173/categories');
+        await page.goto('https://nexolivro.com.br/login');
+        await page.fill('#email', 'emanuelramospaiva@gmail.com');
+        await page.fill('#password', 'Manu010!');
+        await page.getByRole("button", { name: "Entrar" }).click();
+        
+        await expect(page).toHaveURL('https://nexolivro.com.br/');
+        await page.waitForLoadState('networkidle');
+        
+        await page.getByRole("link", {name: "Categorias"}).click();
+        await page.waitForLoadState('networkidle');
+        
+        await expect(page.locator('h1.page-title')).toContainText('Categorias');
+        
+        await page.waitForSelector('#name', { state: 'visible', timeout: 5000 });
+        
         await page.fill('#name', ' ');
-        await page.click('button[type="submit"]');
-
-        const required = await page.locator('#name');
-        await expect(required).toHaveAttribute('required');
+        
+        // Clicar no botão de adicionar categoria
+        await page.getByRole('button', { name: 'Adicionar Categoria' }).click();
+        
+        // Verificar o atributo required
+        const nameField = page.locator('#name');
+        await expect(nameField).toHaveAttribute('required');
     })
 })

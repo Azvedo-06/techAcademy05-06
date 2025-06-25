@@ -1,7 +1,6 @@
 import sequelize from "./config/database";
 import app from "./app";
 
-// Import models in correct order
 import "./models/AuthorModel";
 import "./models/CategoryModel";
 import "./models/BookModel";
